@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+    <h3>cross collection duplication: </h3>
+    <h3>Enter the details of the collection from where the data to be copied: </h3>
+  <label for="collection-name">Enter Collection Name:</label>
+  <input type="text" id="collection-name-1" name="collection-name">
+  <label for="document-id">Enter Document ID:</label>
+  <input type="text" id="document-id-1" name="document-id">
+  <label for="subcollection">Enter Sub Collection:</label>
+  <input type="text" id="subcollection1" name="subcollection">
+  <label for="subDocument">Enter Sub Document:</label>
+  <input type="text" id="subDocument1" name="subDocument">
+  <hr>
+  <h3>Enter the details to where the data will be copied:</h3>
+  <label for="collection-name">Enter Collection Name:</label>
+  <input type="text" id="collection-name-2" name="collection-name">
+  <label for="document-id">Enter Document ID:</label>
+  <input type="text" id="document-id-2" name="document-id">
+  <label for="subcollection">Enter Sub Collection:</label>
+  <input type="text" id="subcollection2" name="subcollection">
+  <label for="document-id">Enter new Document ID:</label>
+  <input type="text" id="new_document-id-2" name="document-id">
+  <button id="duplicate_subDoc_btn">Duplicate Sub Document</button>
+  <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-analytics.js"></script>
+<!-- Add Firebase products that you want to use -->
+<script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-firestore.js"></script>
+<script src="./firebase.js"></script>
+  <script>
+     var db=firebase.firestore();
+     document.getElementById("duplicate_subDoc_btn").addEventListener("click", function(event) {
+     var collectionName1 = document.getElementById("collection-name-1").value;
+     var documentId1 = document.getElementById("document-id-1").value;
+     var subcollection1 = document.getElementById("subcollection1").value;
+     var subDocument1 = document.getElementById("subDocument1").value;
+     var collectionName2 = document.getElementById("collection-name-2").value;
+     var documentId2 = document.getElementById("document-id-2").value;
+     var subcollection2 = document.getElementById("subcollection2").value;
+     var newdocumentId2 = document.getElementById("new_document-id-2").value;
+     console.log(collectionName1+documentId1+subcollection1+subDocument1);
+     console.log(collectionName2+documentId2+subcollection2+newdocumentId2);
+     duplicateSubDocument(collectionName2, documentId2,subcollection1,subDocument1,newdocumentId2,collectionName1,documentId1,subcollection2);
+   });
+
+   function duplicateSubDocument(collectionName2, documentId2,subcollection1,subDocument1,newDocumentId2,collectionName1,documentId1,subcollection2) {
+      // Get the document to duplicate
+      var docRef = db.collection(`${collectionName1}/${documentId1}/${subcollection1}`).doc(subDocument1);
+  docRef.get().then(function(doc) {
+    if (doc.exists) {
+      // Duplicate the document
+      var data = doc.data();
+      data.documentId = newDocumentId2;
+      db.collection(`${collectionName2}/${documentId2}/${subcollection2}`).doc(newDocumentId2).set(data)
+        .then(function(docRef) {
+          // Set the documentId field to the ID of the newly created document
+          docRef.update({ documentId: docRef.id })
+            .then(function() {
+              console.log("Document duplicated with ID: ", docRef.id);
+              alert("document duplicated successfully");
+            })
+            .catch(function(error) {
+              console.error("Error setting documentId field: ", error);
+            });
+        })
+        .catch(function(error) {
+          console.error("Error duplicating document: ", error);
+        });
+    } else {
+      console.error("Document does not exist");
+    }
+  }).catch(function(error) {
+    console.error("Error getting document: ", error);
+  });
+    }
+  </script>
+</body>
+</html>
+<!-- zerseInternships/   -->
